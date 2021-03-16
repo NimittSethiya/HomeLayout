@@ -26,8 +26,8 @@ class _SearchState extends State<Search> with SingleTickerProviderStateMixin {
   TabController _tabController;
   List<Profile> profile;
 
-  var temp;
   var totalMatch=0;
+  var temp = 20;
 
   Future<Profile> fetchData() async {
     final response =
@@ -60,7 +60,6 @@ class _SearchState extends State<Search> with SingleTickerProviderStateMixin {
     super.initState();
     fetchData();
     _tabController = new TabController(length: 2, vsync: this);
-    temp = 20;
   }
 
   @override
@@ -121,7 +120,7 @@ class _SearchState extends State<Search> with SingleTickerProviderStateMixin {
             child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: Container(
-                    height: (40 * temp).toDouble(), child: datesList)),
+                    height: (35 * temp).toDouble(), child: datesList)),
           ),
         ],
       )),
@@ -150,8 +149,11 @@ class _SearchState extends State<Search> with SingleTickerProviderStateMixin {
     print("here");
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: Colors.white,
+      duration: Duration(days: 1),
+      elevation: 1.0,
       content: Container(
         height: 20,
+        color: Colors.white,
         child: Center(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -196,10 +198,21 @@ class _SearchState extends State<Search> with SingleTickerProviderStateMixin {
           return acceptedData[index] != null
               ? Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(acceptedData[index]),
-                    maxRadius: 35,
-                    minRadius: 35,
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: new BoxDecoration(
+                            image:new DecorationImage(
+                              fit: BoxFit.contain,
+                                image: NetworkImage(acceptedData[index])),
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(color: Colors.greenAccent,width: 1)
+                        ),
+                      ),
+                      Positioned(bottom: 0,right: 2,child: Icon(Entypo.dot_single,color: Colors.lightGreenAccent,size: 30,))
+                    ],
                   ),
                 )
               : Padding(
@@ -234,6 +247,7 @@ class _SearchState extends State<Search> with SingleTickerProviderStateMixin {
   dataList(BuildContext context, int index) {
     return GestureDetector(
       onTap:() {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         Navigator.of(context).push(MaterialPageRoute(builder: (_)=>ProfileData(profile: profile[index],)));
       },
       child: Draggable(
@@ -317,31 +331,6 @@ class _SearchState extends State<Search> with SingleTickerProviderStateMixin {
               ),
             ),
       ),
-    );
-  }
-
-  Future<void> _showMyDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return Container(
-          height: 20,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Colors.white
-          ),
-          // child: ListTile(
-          //   trailing: IconButton(
-          //     icon: Icon(Entypo.cross),
-          //     onPressed: (){
-          //       Navigator.pop(context);
-          //     },
-          //   ),
-          //   title: Text("We have $totalMatch for you today"),
-          // ),
-        );
-      },
     );
   }
 }
